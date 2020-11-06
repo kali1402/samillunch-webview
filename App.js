@@ -3,15 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
-import { Notifications } from 'expo';
+import * as Notifications from 'expo-notifications'
 import * as Permissions from 'expo-permissions';
 
-const PUSH_REGISTRATION_ENDPOINT = "http://a1224a3424da.ngrok.io/token";
-const MESSAGE_ENPOINT = "http://a1224a3424da.ngrok.io/message";
+const PUSH_REGISTRATION_ENDPOINT = "https://gvn8elh9kk.execute-api.ap-northeast-2.amazonaws.com/v1/token";
+const MESSAGE_ENPOINT = "https://gvn8elh9kk.execute-api.ap-northeast-2.amazonaws.com/v1/message";
 
 export default function App() {
-
-
   const [state, setState] = useState({
     Notifications: null,
     messageText: "",
@@ -23,11 +21,11 @@ export default function App() {
     if (status !== "granted") {
       return;
     }
-    let token = await Notifications.getExpoPushTokenAsync();
 
+    let token = await Notifications.getExpoPushTokenAsync();
     return axios.post(PUSH_REGISTRATION_ENDPOINT, {
       token: {
-        value: token,
+        value: token.data,
       },
       user: {
         username: "kali",
@@ -53,14 +51,16 @@ export default function App() {
     setState({ messageText: "" });
   };
 
-  useEffect(() => {
-    axios.get('http://smaillunch.kro.kr:3000/lunch').then((res) => res.data.match(/[^점심메뉴]/g).join('').match(/[가-힣,]/g).join('').trim())
-      .then(res => sendMessage(res))
-  }, [])
+  const getLunch = async () => {
+    const data = await axios.get('https://gvn8elh9kk.execute-api.ap-northeast-2.amazonaws.com/v1');
+    const res = data.data.join(", ");
+    sendMessage(res);
+  }
 
   useEffect(() => {
+    getLunch();
     registerForPushNotificationsAsync();
-  }, []);
+  }, [])
 
 
   return (
