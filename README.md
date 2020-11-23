@@ -1,1 +1,2 @@
-# samillunch-webview
+aws ec2 인스턴스로 api를 만들어서 불러온다.
+웹뷰를 실행하면 토큰이 저장되어 aws lambda로 함수실행을해서 급식메뉴가 실행한 휴대폰에 알람이 온다.
